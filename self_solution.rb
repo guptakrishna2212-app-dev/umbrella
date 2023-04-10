@@ -1,8 +1,10 @@
+require "date"
 p "Will you need an umbrella today?"
 
 p "Where are you?"
 
-user_location = gets.chomp
+#user_location = gets.chomp
+user_location = "Kansas"
 
 gmaps_key = ENV.fetch("GMAPS_KEY")
 
@@ -42,8 +44,10 @@ repeat_array.each_with_index do |each_hour, each_index|
   array.push(repeat_array[each_index]["precipProbability"])
 end
 
+#array has precip_probabilities sequentially for the next 12 hours
 array = array[0..11]
 
+#rain_array is checking if any of those elements is >0.1 and storing precip_probabilities>0.1
 rain_array = Array.new
 array.each_with_index do |element, each_index|
   if element>0.1
@@ -51,10 +55,16 @@ array.each_with_index do |element, each_index|
   end
 end
 
-require "date"
 
-if !rain_array.empty?
-  p "Rain expected soon, carry an umbrella"
-else
+
+
+if rain_array.empty?
   p "No rain expected in next 12 hours"
+else
+  index = array.index(rain_array[0])
+  time_at_rain_unix = repeat_array[index.to_i]["time"]
+  time_at_rain_normal = Time.at(time_at_rain_unix)
+  time_now = Time.now
+  time_difference = time_at_rain_normal - time_now
+  p "Rain expected in #{(time_difference/3600).round} hours, carry an umbrella"
 end
